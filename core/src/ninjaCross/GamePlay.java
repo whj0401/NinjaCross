@@ -116,21 +116,19 @@ public class GamePlay extends ApplicationAdapter {
 			temp = ball.getY_speed();
 			ball.setY_speed(bottle.getY_speed() / 5);
 			bottle.setY_speed(temp * 5);
-			ball.resetStateTime();
-			bottle.resetStateTime();
 		}
 		else if(p == 1 || p == 3){
 			temp = ball.get_x_speed_With_stateTime();
 			ball.setX_speed(bottle.get_x_speed_With_stateTime() / 5);
 			bottle.setX_speed(temp * 5);
-			ball.resetStateTime();
-			bottle.resetStateTime();
 		}
 		else if(p == 2 || p == 4){
 			temp = ball.getY_speed();
 			ball.setY_speed(bottle.getY_speed() / 5);
 			bottle.setY_speed(temp * 5);
 		}
+		ball.resetStateTime();
+		bottle.resetStateTime();
 		gameStage.draw();
 	}
 }

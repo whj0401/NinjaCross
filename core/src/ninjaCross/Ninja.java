@@ -72,6 +72,7 @@ public class Ninja extends Actor{
 				dragTime += Gdx.graphics.getDeltaTime();
 				if(dragTime < maxDragTime){
 				setOriginPosition(GamePlay.pointer.getNowX(), GamePlay.pointer.getNowY());
+				reflect();
 				calculateDefaultSpeed(GamePlay.pointer.getDownX(), GamePlay.pointer.getDownY(), GamePlay.pointer.getNowX(), GamePlay.pointer.getNowY());
 //				System.out.println("drag");
 				}
@@ -182,6 +183,9 @@ public class Ninja extends Actor{
 	private void move(float mx, float my){
 		x += mx;
 		y += my;
+		
+		reflect();
+		
 		for(int i = 0; i < 5; i++){
 			collision[i][0] += mx;
 			collision[i][1] += my;
@@ -189,6 +193,27 @@ public class Ninja extends Actor{
 		
 		sprite.setPosition(x, y);
 		super.setPosition(x, y);
+	}
+	
+	private void reflect(){
+		if(x < 0){
+			x = 0;
+			x_speed = -get_x_speed_With_stateTime();
+			resetStateTime();
+		}
+		else if(x > GamePlay.width - 2 * r){
+			x = GamePlay.width - 2 * r;
+			x_speed = -get_x_speed_With_stateTime();
+			resetStateTime();
+		}
+		else if(y < 0){
+			y = 0;
+			y_speed = -y_speed;
+		}
+		else if(y > GamePlay.height - 2 * r){
+			y = GamePlay.height - 2 * r;
+			y_speed = -y_speed;
+		}
 	}
 	
 }
