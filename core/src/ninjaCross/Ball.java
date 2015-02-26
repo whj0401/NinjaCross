@@ -29,6 +29,8 @@ public class Ball {
 	
 	float upW, doW, upH, doH;
 	
+	float[][] collision;
+	
 	public Ball(float width, float height){
 		this.width = width;
 		this.height = height;
@@ -47,11 +49,14 @@ public class Ball {
 		upH = 1.5f * height;
 		doW = -width / 2;
 		doH = -height / 2;
+		
+		collision = new float[5][2];
 	}
 	
 	public void setPosition(int x, int y){
 		this.y = y;
 		this.x = x;
+		this.iniCollisionPosition();
 	}
 	
 	public void setOriginPosition(int x, int y){
@@ -73,7 +78,7 @@ public class Ball {
 		formerStateTime = 0;
 	}
 	
-	private float get_x_speed_With_stateTime(){
+	public float get_x_speed_With_stateTime(){
 		return x_speed + stateTime * gravity;
 	}
 	
@@ -85,6 +90,7 @@ public class Ball {
 			y += y_speed;
 			x += get_x_speed_With_stateTime();
 			sprite.setPosition(x, y);
+			this.iniCollisionPosition();
 		}
 		batch.begin();
 		sprite.draw(batch);
@@ -96,5 +102,39 @@ public class Ball {
 				y - this.y < upW && y - this.y > doW) 
 			return true;
 		return false;
+	}
+
+	public void setX_speed(float f) {
+		x_speed = f;
+	}
+
+	public float getY_speed() {
+		return y_speed;
+	}
+
+	public void setY_speed(float f) {
+		y_speed = f;
+	}
+
+	public void resetStateTime() {
+		stateTime = 0;
+		formerStateTime = 0;
+	}
+	
+	private void iniCollisionPosition(){
+		collision[0][0] = x + width / 2;//中心
+		collision[0][1] = y + height / 2;
+		
+		collision[1][0] = x;//极上
+		collision[1][1] = collision[0][1];
+		
+		collision[2][0] = collision[0][0];//极右
+		collision[2][1] = y + height;
+		
+		collision[3][0] = x + this.width;//极下
+		collision[3][1] = collision[0][1];
+		
+		collision[4][0] = collision[0][0];//极左
+		collision[4][1] = y;
 	}
 }

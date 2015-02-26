@@ -21,9 +21,14 @@ public class Ninja extends Actor{
 	
 	private float x, y;
 	
+	private float r = 0;
+	
 	float stateTime = 0;
 	float formerStateTime = 0;
 	static float stepTime = 0.025f;
+	
+	float dragTime = 0;
+	static float maxDragTime = 0.2f;
 	
 	private static float rotate = -20;
 	private static float gravity = 0;//重力
@@ -32,38 +37,54 @@ public class Ninja extends Actor{
 	
 	
 	public Ninja(float width, float height){
-		this.setWidth(width);
-		this.setHeight(height);
 		
 		texture = new Texture(Gdx.files.internal(File.ninja));
 		region = new TextureRegion(texture);
 		sprite = new Sprite(region);
 		
 		sprite.setSize(width, height);
+		
+		r = width / 2;
+		
 		sprite.setOrigin(width / 2, height / 2);
 		
-		collision = new float[5][2];
+		collision = new float[9][2];
+		
+		this.setSize(width, height);
+		this.setOrigin(width / 2, height / 2);
 		
 		this.addListener(new InputListener(){
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
 				DOWN = true;
-				setPosition(x - getWidth() / 2, y - getHeight() / 2);
+//				System.out.println("down");
+				dragTime = 0;
 				return true;
 			}
 			@Override
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button){
 				DOWN = false;
-				setPosition(x - getWidth() / 2, y - getHeight() / 2);
+//				System.out.println("up");
 			}
 			@Override
 			public void touchDragged(InputEvent event, float x, float y, int pointer){
-				setPosition(x - getWidth() / 2, y - getHeight() / 2);
+				
+				dragTime += Gdx.graphics.getDeltaTime();
+				if(dragTime < maxDragTime){
+				setOriginPosition(GamePlay.pointer.getNowX(), GamePlay.pointer.getNowY());
+				calculateDefaultSpeed(GamePlay.pointer.getDownX(), GamePlay.pointer.getDownY(), GamePlay.pointer.getNowX(), GamePlay.pointer.getNowY());
+//				System.out.println("drag");
+				}
+				else{
+					DOWN = false;
+				}
 			}
 		});
 	}
 	
+	@Override
 	public void setPosition(float x, float y){
+		super.setPosition(x, y);
 		this.x = x;
 		this.y = y;
 		
@@ -75,6 +96,10 @@ public class Ninja extends Actor{
 		formerStateTime = 0;
 	}
 	
+	public void setOriginPosition(float x, float y){
+		this.setPosition(x - getWidth() / 2, y - getHeight() / 2);
+	}
+	
 	@Override
 	public void draw(Batch batch, float parentAlpha){
 		stateTime += Gdx.graphics.getDeltaTime();
@@ -82,6 +107,7 @@ public class Ninja extends Actor{
 			formerStateTime = stateTime;
 			sprite.rotate(rotate);
 			this.move(get_x_speed_With_stateTime(), y_speed);
+//			System.out.println(y_speed);
 		}
 		sprite.draw(batch);
 	}
@@ -89,6 +115,7 @@ public class Ninja extends Actor{
 	public void calculateDefaultSpeed(float frontX, float frontY, float nowX, float nowY){
 		x_speed = (nowX - frontX) / 30;
 		y_speed = (nowY - frontY) / 30;
+//		System.out.println(y_speed);
 		
 		stateTime = 0;
 		formerStateTime = 0;
@@ -97,26 +124,59 @@ public class Ninja extends Actor{
 	public void setGravity(float g){
 		Ninja.gravity = g;
 	}
+	
+	public float getX_speed(){
+		return x_speed;
+	}
+	
+	public float getY_speed(){
+		return y_speed;
+	}
+	
+	public void setX_speed(float speed){
+		x_speed = speed;
+	}
+	
+	public void setY_speed(float speed){
+		y_speed = speed;
+	}
 
-	private float get_x_speed_With_stateTime() {
+	public float get_x_speed_With_stateTime() {
 		return x_speed + stateTime * gravity;
 	}
 	
+	public void resetStateTime(){
+		stateTime = 0;
+		formerStateTime = 0;
+	}
+	
 	private void iniCollisionPosition(){
-		collision[0][0] = x + this.getWidth() / 2;//中心
-		collision[0][1] = y + this.getHeight() / 2;
+		collision[0][0] = x + r;//中心
+		collision[0][1] = y + r;
 		
-		collision[1][0] = x;//极左
+		collision[1][0] = x;//极上
 		collision[1][1] = collision[0][1];
 		
-		collision[2][0] = collision[0][0];//极上
-		collision[2][1] = y + this.getHeight();
+		collision[2][0] = collision[0][0];//极右
+		collision[2][1] = y + 2 * r;
 		
-		collision[3][0] = x + this.getWidth();//极右
+		collision[3][0] = x + 2 * r;//极下
 		collision[3][1] = collision[0][1];
 		
-		collision[4][0] = collision[0][0];//极下
+		collision[4][0] = collision[0][0];//极左
 		collision[4][1] = y;
+		
+		collision[5][0] = collision[0][0] - 0.7f * r;
+		collision[5][1] = collision[0][1] - 0.7f * r;
+		
+		collision[6][0] = collision[0][0] + 0.7f * r;
+		collision[6][1] = collision[0][1] - 0.7f * r;
+		
+		collision[7][0] = collision[0][0] + 0.7f * r;
+		collision[7][1] = collision[0][1] + 0.7f * r;
+		
+		collision[8][0] = collision[0][0] - 0.7f * r;
+		collision[8][1] = collision[0][1] + 0.7f * r;
 	}
 	
 	private void move(float mx, float my){
@@ -128,6 +188,7 @@ public class Ninja extends Actor{
 		}
 		
 		sprite.setPosition(x, y);
+		super.setPosition(x, y);
 	}
 	
 }

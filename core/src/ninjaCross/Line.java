@@ -95,14 +95,6 @@ public class Line {
 		}
 	}
 	
-	public float getLength(){
-		return width;
-	}
-	
-	public float getDegree(){
-		return degree;
-	}
-	
 	private void setImgBounds(){
 		width = (float) Math.sqrt((rX - fX) * (rX - fX) + (rY - fY) * (rY - fY));
 		height = width / 20;
