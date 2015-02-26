@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Line {
-	private static String imgPath = "blue-pointer.png";
 	
 	private Texture texture;
 	private TextureRegion img;
@@ -29,9 +28,9 @@ public class Line {
 	static float dragMaxTime = 0.2f;
 	static float stepTime = 0.0625f;
 	
-	public Line(){
+	public Line(String PicPath){
 		batch = new SpriteBatch();
-		texture = new Texture(Gdx.files.internal(imgPath));
+		texture = new Texture(Gdx.files.internal(PicPath));
 		img = new TextureRegion(texture, 0, 0, texture.getWidth(), texture.getHeight());
 		sprite = new Sprite(img);
 		sprite.setSize(width, height);
