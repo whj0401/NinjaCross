@@ -31,7 +31,7 @@ public class GamePlay extends ApplicationAdapter {
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 		
-		diameter_ball = height / 5;
+		diameter_ball = height / 4;
 		
 		width_bottle = height / 4;
 		height_bottle = width_bottle / 2;
