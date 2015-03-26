@@ -23,6 +23,8 @@ public class GamePlay extends ApplicationAdapter {
 	
 	static int condition = 0;//0为等待开始状态，1为开始游戏状态，2为游戏结束状态
 	
+	static float time = 0;
+	
 	static BitmapFont font;
 	static SpriteBatch batch;
 	
@@ -32,8 +34,8 @@ public class GamePlay extends ApplicationAdapter {
 	
 	Line line;
 	static Ninja ball;
-	static int broken = 3;//记录可以碰撞的次数
-	final static int brokenIni = 3;
+	static int broken = 10;//记录可以碰撞的次数
+	final static int brokenIni = 10;
 	
 	Bottle[] bottle;
 	@Override
@@ -60,10 +62,13 @@ public class GamePlay extends ApplicationAdapter {
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button){
 				if(condition == 0){
 					condition = 1;
+					time = 0;
+					broken = brokenIni;
 				}
 				else if(condition == 2){
 					condition = 0;
 					broken = brokenIni;
+					time = 0;
 				}
 				
 			}
@@ -102,6 +107,7 @@ public class GamePlay extends ApplicationAdapter {
 		if(condition == 1){
 			ball.setX_gravity(Gdx.input.getAccelerometerY() * width / 100);
 			ball.setY_gravity(-Gdx.input.getAccelerometerX() * height / 100);
+			time += Gdx.graphics.getDeltaTime();
 		}
 		
 		
@@ -136,6 +142,10 @@ public class GamePlay extends ApplicationAdapter {
 			batch.end();
 		}
 		else if(condition == 1){
+			batch.begin();
+			font.drawMultiLine(batch, broken+"", 0, height-diameter_ball);
+			font.drawMultiLine(batch, time+"", width-diameter_ball, height-diameter_ball);
+			batch.end();
 			for(int p = 0; p <= 8; p++){
 				Actor temp = gameStage.hit(ball.collision[p][0], ball.collision[p][1], true);
 				if(temp instanceof Ninja) return;
