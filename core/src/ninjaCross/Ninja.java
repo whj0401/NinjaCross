@@ -31,7 +31,8 @@ public class Ninja extends Actor{
 	static float maxDragTime = 0.2f;
 	
 	private static float rotate = -20;
-	private static float gravity = 0;//重力
+	private static float x_gravity = 0;//重力
+	private static float y_gravity = 0;
 	
 	float[][] collision;
 	
@@ -72,9 +73,9 @@ public class Ninja extends Actor{
 				dragTime += Gdx.graphics.getDeltaTime();
 				if(dragTime < maxDragTime){
 				setOriginPosition(GamePlay.pointer.getNowX(), GamePlay.pointer.getNowY());
-				reflect();
-				calculateDefaultSpeed(GamePlay.pointer.getDownX(), GamePlay.pointer.getDownY(), GamePlay.pointer.getNowX(), GamePlay.pointer.getNowY());
-//				System.out.println("drag");
+//				reflect();
+				stop();
+//				calculateDefaultSpeed(GamePlay.pointer.getDownX(), GamePlay.pointer.getDownY(), GamePlay.pointer.getNowX(), GamePlay.pointer.getNowY());
 				}
 				else{
 					DOWN = false;
@@ -107,8 +108,9 @@ public class Ninja extends Actor{
 		if(stateTime - formerStateTime > stepTime){
 			formerStateTime = stateTime;
 			sprite.rotate(rotate);
-			this.move(get_x_speed_With_stateTime(), y_speed);
-//			System.out.println(y_speed);
+			x_speed += x_gravity;
+			y_speed += y_gravity;
+			this.move(x_speed, y_speed);
 		}
 		sprite.draw(batch);
 	}
@@ -116,14 +118,17 @@ public class Ninja extends Actor{
 	public void calculateDefaultSpeed(float frontX, float frontY, float nowX, float nowY){
 		x_speed = (nowX - frontX) / 30;
 		y_speed = (nowY - frontY) / 30;
-//		System.out.println(y_speed);
 		
 		stateTime = 0;
 		formerStateTime = 0;
 	}
 	
-	public void setGravity(float g){
-		Ninja.gravity = g;
+	public void setX_gravity(float g){
+		Ninja.x_gravity = g * stepTime;
+	}
+	
+	public void setY_gravity(float g){
+		Ninja.y_gravity = g * stepTime;
 	}
 	
 	public float getX_speed(){
@@ -143,7 +148,11 @@ public class Ninja extends Actor{
 	}
 
 	public float get_x_speed_With_stateTime() {
-		return x_speed + stateTime * gravity;
+		return x_speed + stateTime * x_gravity;
+	}
+	
+	public float get_y_speed_With_stateTime(){
+		return y_speed + stateTime * y_gravity;
 	}
 	
 	public void resetStateTime(){
@@ -184,36 +193,80 @@ public class Ninja extends Actor{
 		x += mx;
 		y += my;
 		
-		reflect();
+		if(stop()) {
+			iniCollisionPosition();
+			sprite.setPosition(x, y);
+			super.setPosition(x, y);
+			return;
+		}
+//		if(reflect()) {
+//			iniCollisionPosition();
+//			sprite.setPosition(x, y);
+//			super.setPosition(x, y);
+//			return;
+//		}
 		
 		for(int i = 0; i < 5; i++){
 			collision[i][0] += mx;
 			collision[i][1] += my;
 		}
 		
+		
+		
 		sprite.setPosition(x, y);
 		super.setPosition(x, y);
 	}
 	
-	private void reflect(){
+	private boolean reflect(){
+		boolean outOfSight = false;
 		if(x < 0){
 			x = 0;
 			x_speed = -get_x_speed_With_stateTime();
-			resetStateTime();
+			outOfSight = true;
 		}
 		else if(x > GamePlay.width - 2 * r){
 			x = GamePlay.width - 2 * r;
 			x_speed = -get_x_speed_With_stateTime();
-			resetStateTime();
+			outOfSight = true;
 		}
-		else if(y < 0){
+		if(y < 0){
 			y = 0;
-			y_speed = -y_speed;
+			y_speed = -get_y_speed_With_stateTime();
+			outOfSight = true;
 		}
 		else if(y > GamePlay.height - 2 * r){
 			y = GamePlay.height - 2 * r;
-			y_speed = -y_speed;
+			y_speed = -get_y_speed_With_stateTime();
+			outOfSight = true;
 		}
+		if(outOfSight) resetStateTime();
+		return outOfSight;
+	}
+	
+	private boolean stop(){
+		boolean outOfSight = false;
+		if(x < 0){
+			x = 0;
+			x_speed = 0;
+			outOfSight = true;
+		}
+		else if(x > GamePlay.width - 2 * r){
+			x = GamePlay.width - 2 * r;
+			x_speed = 0;
+			outOfSight = true;
+		}
+		if(y < 0){
+			y = 0;
+			y_speed = 0;
+			outOfSight = true;
+		}
+		else if(y > GamePlay.height - 2 * r){
+			y = GamePlay.height - 2 * r;
+			y_speed = 0;
+			outOfSight = true;
+		}
+		if(outOfSight) resetStateTime();
+		return outOfSight;
 	}
 	
 }

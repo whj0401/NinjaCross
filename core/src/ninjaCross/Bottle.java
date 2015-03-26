@@ -21,9 +21,10 @@ public class Bottle extends Actor{
 	static float rotate = 20;
 	int rotateTimes = 0;
 	
-	static float gravity = 0;//重力
+	private static float x_gravity = 0;//重力
+	private static float y_gravity = 0;
 	
-	private float xSpeed, ySpeed = 0;
+	private float x_speed, y_speed = 0;
 	
 	private float width, height;
 	
@@ -62,10 +63,9 @@ public class Bottle extends Actor{
 			formerStateTime = stateTime;
 			this.rotateBy(rotate * ++rotateTimes);
 			sprite.rotate(rotate);
-			x += get_x_speed_With_stateTime();
-			y += ySpeed;
-			this.setPosition(x, y);
-			sprite.setPosition(x, y);
+//			x_speed += x_gravity;
+//			y_speed += y_gravity;
+			move(x_speed, y_speed);
 		}
 		sprite.draw(batch);
 	}
@@ -77,8 +77,12 @@ public class Bottle extends Actor{
 		return true;
 	}
 	
-	public static void setGravity(float g){
-		gravity = g;
+	public static void setX_gravity(float g){
+		x_gravity = g * stepTime;
+	}
+	
+	public static void setY_gravity(float g){
+		y_gravity = g * stepTime;
 	}
 	
 	public boolean isOutOfSight(){
@@ -92,57 +96,77 @@ public class Bottle extends Actor{
 		stateTime = 0;
 		formerStateTime = 0;
 		int t = (int) (Math.random() * 4);
+		int choiceSpeed = (int)(Math.random() * 5) + 1;
 		switch(t){
 		case 0:
 			x = -width;
 			y = (float) (-Math.random() * GamePlay.height);
-			xSpeed = (float) (Math.random() * 5) * gravity;
-			ySpeed = (float) (Math.random() * 0.5) * gravity;
+//			x_speed = (float) (Math.random() * 5) * x_gravity / stepTime;
+//			y_speed = (float) (Math.random() * 0.5) * y_gravity / stepTime;
+			x_speed = (GamePlay.ball.collision[0][0] - x) * stepTime * choiceSpeed;
+			y_speed = (GamePlay.ball.collision[0][1] - y) * stepTime * choiceSpeed;
 			break;
 		case 1:
 			x = (float) (-Math.random() * GamePlay.width);
 			y = GamePlay.height + height;
-			xSpeed = (float) (Math.random() * 5) * gravity;
-			ySpeed = -(float) (Math.random() * 5) * gravity;
+//			x_speed = (float) (Math.random() * 5) * x_gravity / stepTime;
+//			y_speed = -(float) (Math.random() * 5) * y_gravity / stepTime;
+			x_speed = (GamePlay.ball.collision[0][0] - x) * stepTime * choiceSpeed;
+			y_speed = (GamePlay.ball.collision[0][1] - y) * stepTime * choiceSpeed;
 			break;
 		case 2:
 			x = GamePlay.width + width;
 			y = (float) (Math.random() * GamePlay.height);
-			xSpeed = (float) (-Math.random() * 5) * gravity;
-			ySpeed = (float) (Math.random() * 0.5) * gravity;
+//			x_speed = (float) (-Math.random() * 5) * x_gravity / stepTime;
+//			y_speed = (float) (Math.random() * 0.5) * y_gravity / stepTime;
+			x_speed = (GamePlay.ball.collision[0][0] - x) * stepTime * choiceSpeed;
+			y_speed = (GamePlay.ball.collision[0][1] - y) * stepTime * choiceSpeed;
 			break;
 		case 3:
 			x = (float) (Math.random() * GamePlay.width);
 			y = -height;
-			xSpeed = (float) (-Math.random() * 2) * gravity;
-			ySpeed = (float) (Math.random() * 2) * gravity;
+//			x_speed = (float) (-Math.random() * 2) * x_gravity / stepTime;
+//			y_speed = (float) (Math.random() * 2) * y_gravity / stepTime;
+			x_speed = (GamePlay.ball.collision[0][0] - x) * stepTime * choiceSpeed;
+			y_speed = (GamePlay.ball.collision[0][1] - y) * stepTime * choiceSpeed;
 			break;
 		}
 	}
 	
 	public float getX_speed(){
-		return xSpeed;
+		return x_speed;
 	}
 	
 	public float getY_speed(){
-		return ySpeed;
+		return y_speed;
 	}
 	
 	public void setX_speed(float speed){
-		xSpeed = speed;
+		x_speed = speed;
 	}
 	
 	public void setY_speed(float speed){
-		ySpeed = speed;
+		y_speed = speed;
 	}
 	
-	public float get_x_speed_With_stateTime(){
-		return xSpeed + stateTime * gravity;
+	public float get_x_speed_With_stateTime() {
+		return x_speed + stateTime * x_gravity;
+	}
+	
+	public float get_y_speed_With_stateTime(){
+		return y_speed + stateTime * y_gravity;
 	}
 	
 	public void resetStateTime(){
 		stateTime = 0;
 		formerStateTime = 0;
+	}
+	
+	private void move(float mx, float my){
+		x += mx;
+		y += my;
+		sprite.setPosition(x, y);
+		super.setPosition(x, y);
 	}
 	
 }
