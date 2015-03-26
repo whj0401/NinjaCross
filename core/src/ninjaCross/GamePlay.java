@@ -64,6 +64,10 @@ public class GamePlay extends ApplicationAdapter {
 					condition = 1;
 					time = 0;
 					broken = brokenIni;
+					for(int i = 0; i < 5; i++){
+						bottle[i].reset();
+					}
+					ball.setOriginPosition(width / 2, height / 2);
 				}
 				else if(condition == 2){
 					condition = 0;
@@ -162,7 +166,7 @@ public class GamePlay extends ApplicationAdapter {
 		}
 		else if(condition == 2){
 			batch.begin();
-			font.drawMultiLine(batch, "GAME\nOVER", (width/2-diameter_ball), (height-diameter_ball)/2);
+			font.drawMultiLine(batch, "GAME OVER\n"+time+" S", (width/2-diameter_ball), (height-diameter_ball)/2);
 			batch.end();
 		}
 	}
